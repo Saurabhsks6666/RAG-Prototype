@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watrana Knowledge Assistant</title>
+
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+    body { margin: 0; background: #f4eee5; color: #111; }
+
+    .topbar {
+      height: 80px;
+      background: #807a7aee;
+      color: rgb(179, 171, 171);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { height: 58px; width: auto; object-fit: contain; }
+    .fallback-logo { font-size: 28px; font-weight: bold; letter-spacing: 4px; }
+    .rag-badge { background: #d64b12; color: white; font-size: 12px; padding: 4px 8px; border-radius: 3px; letter-spacing: 1px; }
+    .subtitle { color: #0c0c0c; font-size: 14px; }
+
+    .layout { display: flex; height: calc(100vh - 70px); }
+
+    .sidebar {
+      width: 290px;
+      background: #eee8dc;
+      border-right: 1px solid #d2c8b8;
+      padding: 22px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #8b7e6b;
+      letter-spacing: 2px;
+      margin: 12px 0;
+      border-bottom: 1px solid #d1c5b4;
+      padding-bottom: 8px;
+    }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+    .stat-card { background: #f8f4ec; border: 1px solid #d2c8b8; border-radius: 4px; padding: 15px; text-align: center; }
+    .stat-number { color: #d64b12; font-size: 26px; font-weight: bold; }
+    .stat-label { font-size: 12px; color: #766b5d; }
+
+    .category, .quick-question {
+      background: #f8f4ec;
+      border: 1px solid #d2c8b8;
+      border-radius: 4px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .quick-question { display: block; line-height: 1.35; }
+    .quick-question:hover, .category:hover { border-color: #d64b12; }
+
+    .main { flex: 1; display: flex; flex-direction: column; background: #f8f2ea; }
+
+    .hero {
+      background: linear-gradient(90deg, #111, #34495e);
+      color: white;
+      padding: 26px 36px;
+      border-bottom: 3px solid #e05b18;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .hero h2 { margin: 0; font-size: 24px; }
+    .hero p { margin: 6px 0 0; color: #cfd8dc; font-size: 14px; }
+
+    .language-box { display: flex; align-items: center; gap: 10px; }
+    .language-box label { font-size: 14px; color: white; }
+    .language-box select {
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: none;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .chat-area { flex: 1; overflow-y: auto; padding: 28px 36px; }
+    .message-row { display: flex; margin-bottom: 20px; }
+    .message-row.user { justify-content: flex-end; }
+    .message-row.bot { justify-content: flex-start; }
+
+    .avatar {
+      min-width: 34px;
+      width: 34px;
+      height: 34px;
+      background: #111;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 17px;
+    }
+
+    .user-bubble {
+      background: #101010;
+      color: white;
+      padding: 15px 18px;
+      border-radius: 4px;
+      max-width: 520px;
+      font-size: 15px;
+      white-space: pre-wrap;
+    }
+
+    .bot-card {
+      background: white;
+      max-width: 920px;
+      padding: 22px;
+      border-radius: 4px;
+      box-shadow: 0 3px 12px rgba(221, 4, 4, 0.15);
+      line-height: 1.8;
+      font-size: 16px;
+      white-space: pre-wrap;
+      letter-spacing: 0.2px;
+      word-spacing: 1px;
+    }
+
+    .answer-text { white-space: pre-wrap; }
+
+    .translate-box {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px dashed #ddd;
+      font-size: 13px;
+      color: #555;
+      white-space: normal;
+    }
+
+    .translate-box select {
+      margin-left: 8px;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .sources {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed #ddd;
+      color: #555;
+      font-size: 13px;
+      white-space: normal;
+    }
+    .brand-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand-logo{
+    height:200px;
+    width:auto;
+    object-fit:contain;
+    }
+
+    .input-area { border-top: 1px solid #d4c8b8; padding: 18px 30px; background: #f3eadf; display: flex; gap: 12px; }
+
+    textarea {
+      flex: 1;
+      height: 52px;
+      resize: none;
+      border: 1px solid #d64b12;
+      border-radius: 5px;
+      padding: 15px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    button {
+      width: 58px;
+      border: none;
+      border-radius: 5px;
+      background: #d64b12;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #b83f0d; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .small-note { font-size: 12px; color: #777; padding-left: 32px; padding-bottom: 10px; background: #f3eadf; }
+    .loading { color: #777; font-style: italic; }
+
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; height: auto; }
+      .sidebar { width: 100%; max-height: 320px; }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .chat-area { padding: 18px; }
+      .topbar { padding: 0 16px; }
+      .subtitle { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="brand-wrap">
+      <!-- Put your logo here: static/images/logo.png -->
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Watrana Logo" class="brand-logo" onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='inline-block';">
+      <span id="fallbackLogo" class="fallback-logo" style="display:none;">WATRANA</span>
+      <!-- <span class="rag-badge">RAG</span> -->
+    </div>
+    <div class="subtitle">Knowledge Assistant · 20 Years of Data</div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="section-title">📊 DATABASE STATISTICS</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number">20</div><div class="stat-label">Total Problems</div></div>
+        <div class="stat-card"><div class="stat-number">20</div><div class="stat-label">Years of Data</div></div>
+        <div class="stat-card"><div class="stat-number">192</div><div class="stat-label">Hours Downtime</div></div>
+        <div class="stat-card"><div class="stat-number">7</div><div class="stat-label">Categories</div></div>
+      </div>
+
+      <div class="section-title">🗂 CATEGORIES</div>
+      <div class="category"><span>Mechanical</span><span>5</span></div>
+      <div class="category"><span>Quality</span><span>4</span></div>
+      <div class="category"><span>Electrical</span><span>4</span></div>
+      <div class="category"><span>Safety</span><span>2</span></div>
+      <div class="category"><span>Hydraulic</span><span>2</span></div>
+      <div class="category"><span>Automation</span><span>2</span></div>
+      <div class="category"><span>Pneumatic</span><span>1</span></div>
+
+      <div class="section-title">💡 QUICK QUESTIONS</div>
+      <div class="quick-question" onclick="setQuestion('What is the solution for motor overheating?')">What is the solution for motor overheating?</div>
+      <div class="quick-question" onclick="setQuestion('Why does hydraulic oil leakage happen and how can it be fixed?')">Why does hydraulic oil leakage happen and how can it be fixed?</div>
+      <div class="quick-question" onclick="setQuestion('What should be done when a PLC crashes?')">What should be done when a PLC crashes?</div>
+      <div class="quick-question" onclick="setQuestion('How can quality defects be controlled?')">How can quality defects be controlled?</div>
+      <div class="quick-question" onclick="setQuestion('What steps should be taken after a safety incident?')">What steps should be taken after a safety incident?</div>
+    </aside>
+
+    <main class="main">
+      <div class="hero">
+        <div>
+          <h2>🔍 Watrana Knowledge Assistant</h2>
+          <p>Get direct answers from 20 years of industrial problems and solutions.</p>
+        </div>
+
+        <!-- <div class="language-box">
+          <label for="language">Answer Language</label>
+          <select id="language">
+            <option value="english" selected>🌐 English</option>
+            <option value="hindi">🇮🇳 Hindi</option>
+            <option value="hinglish">💬 Hinglish</option>
+          </select>
+        </div> -->
+      </div>
+
+      <div class="chat-area" id="chatArea">
+        <div class="message-row bot">
+          <div class="avatar">🤖</div>
+          <div class="bot-card">
+            Hello! I am Watrana Knowledge Assistant.
+            Ask me about machine problems, maintenance issues, breakdowns, quality defects, or safety incidents.
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <textarea id="questionInput" placeholder="Type your question here..."></textarea>
+        <button id="sendBtn" onclick="sendQuestion()">➤</button>
+      </div>
+      <div class="small-note">Enter = Send · Shift + Enter = New Line</div>
+    </main>
+  </div>
+
+  <script>
+    const input = document.getElementById("questionInput");
+    const chatArea = document.getElementById("chatArea");
+    const languageSelect = document.getElementById("language");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function setQuestion(question) {
+      input.value = question;
+      input.focus();
+    }
+
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendQuestion();
+      }
+    });
+
+    function appendUserMessage(question) {
+      const row = document.createElement("div");
+      row.className = "message-row user";
+      row.innerHTML = `<div class="user-bubble">${escapeHtml(question)}</div>`;
+      chatArea.appendChild(row);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function appendBotMessage(answer, sources = []) {
+      const row = document.createElement("div");
+      row.className = "message-row bot";
+
+      let sourceHtml = "";
+      if (sources && sources.length > 0) {
+        sourceHtml = `
+          <div class="sources">
+            <strong>📚 SOURCES USED</strong><br>
+            ${sources.map(formatSource).join("<br>")}
+          </div>
+        `;
+      }
+
+      const safeAnswer = escapeHtml(answer || "No answer returned.");
+
+      row.innerHTML = `
+        <div class="avatar">🤖</div>
+        <div class="bot-card">
+          <div class="answer-text" data-original-answer="${safeAnswer}">${safeAnswer}</div>
+
+          <div class="translate-box">
+            <label>Change generated answer language:</label>
+            <select onchange="translateAnswer(this)">
+              <option value="">Select language</option>
+              <option value="english">English</option>
+              <option value="hindi">Hindi</option>
+              <option value="hinglish">Hinglish</option>
+            </select>
+          </div>
+
+          ${sourceHtml}
+        </div>
+      `;
+
+      chatArea.appendChild(row);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function appendLoadingMessage() {
+      const row = document.createElement("div");
+      row.className = "message-row bot";
+      row.id = "loadingMessage";
+      row.innerHTML = `<div class="avatar">🤖</div><div class="bot-card loading">Thinking...</div>`;
+      chatArea.appendChild(row);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function removeLoadingMessage() {
+      const loading = document.getElementById("loadingMessage");
+      if (loading) loading.remove();
+    }
+
+    async function sendQuestion() {
+      const question = input.value.trim();
+      const language = "english";
+      if (!question) return;
+
+      appendUserMessage(question);
+      input.value = "";
+      appendLoadingMessage();
+      sendBtn.disabled = true;
+
+      try {
+        const response = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: question, language: language })
+        });
+
+        const data = await response.json();
+        removeLoadingMessage();
+
+        if (data.error) {
+          appendBotMessage("Error: " + data.error);
+        } else {
+          appendBotMessage(data.answer, data.sources || []);
+        }
+      } catch (error) {
+        removeLoadingMessage();
+        appendBotMessage("Server connection error. Please check if backend is running.");
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    function formatSource(src) {
+      if (!src || typeof src !== "object") {
+        return `• ${escapeHtml(String(src))}`;
+      }
+
+      if (src.source_type === "database") {
+        return `• Database Record: Problem ID ${escapeHtml(src.id)}, Year ${escapeHtml(src.year)}, Category ${escapeHtml(src.category)}`;
+      }
+
+      if (src.source_type === "pdf") {
+        return `• PDF: ${escapeHtml(src.file_name)}, Page ${escapeHtml(src.page_number)}`;
+      }
+
+      return `• ${escapeHtml(JSON.stringify(src))}`;
+    }
+
+    async function translateAnswer(selectElement) {
+      const language = selectElement.value;
+      if (!language) return;
+
+      const card = selectElement.closest(".bot-card");
+      const answerDiv = card.querySelector(".answer-text");
+      const originalAnswer = answerDiv.getAttribute("data-original-answer") || answerDiv.innerText;
+
+      answerDiv.innerText = "Translating...";
+      selectElement.disabled = true;
+
+      try {
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answer: originalAnswer, language: language })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          answerDiv.innerText = "Translation error: " + data.error;
+        } else {
+          answerDiv.innerText = data.answer;
+        }
+      } catch (error) {
+        answerDiv.innerText = "Translation failed. Please check backend.";
+      } finally {
+        selectElement.disabled = false;
+      }
+    }
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return "";
+      return text
+        .toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

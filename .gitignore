@@ -1,0 +1,21 @@
+# Secret files - KABHI commit mat karo!
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# Database & Vector Store (local data)
+data/watrana.db
+data/chroma_db/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
