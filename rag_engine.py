@@ -25,7 +25,7 @@ _qa_chains = {}
 
 def normalize_language(language="english"):
     language = (language or "english").strip().lower()
-    if language not in ["english", "hindi", "hinglish"]:
+    if language not in ["english", "hindi",]:
         language = "english"
     return language
 
@@ -387,10 +387,9 @@ def translate_answer(answer: str, language="english") -> dict:
 
         if language == "hindi":
             target = "hi"
-        elif language == "english":
-            target = "en"
         else:
-            target = "hi"  # Hinglish ke liye abhi Hindi fallback
+            target = "en"
+       
 
         translated_text = GoogleTranslator(
             source="auto",
